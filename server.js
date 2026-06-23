@@ -34,6 +34,7 @@ app.post('/api/questions/:username', (req, res) => {
   if (!mentorDatabases[user]) mentorDatabases[user] = [];
   
   if (q && a) {
+    // Spasi dan karakter non-huruf dihapus dari jawaban
     mentorDatabases[user].push({ q, a: a.toUpperCase().replace(/[^A-Z]/g, "") });
     return res.json({ success: true });
   }
@@ -57,7 +58,6 @@ io.on('connection', (socket) => {
   socket.on('createRoom', (mentorUsername) => {
     let roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
     
-    // Pastikan akun memiliki bank soal, jika belum ada, buat kosong
     if (!mentorDatabases[mentorUsername]) mentorDatabases[mentorUsername] = [];
 
     activeRooms[roomCode] = {
@@ -91,7 +91,6 @@ io.on('connection', (socket) => {
     if (room && room.hostId === socket.id) {
       room.gameStarted = true;
       
-      // Mengambil soal khusus dari Username Mentor yang bersangkutan
       let myQuestions = mentorDatabases[room.mentorName] || [];
       room.questions = [...myQuestions].sort(() => Math.random() - 0.5).slice(0, 5);
       room.currentQuestionIndex = 0;
@@ -108,13 +107,12 @@ io.on('connection', (socket) => {
     
     Object.keys(room.players).forEach(id => room.players[id].answered = false);
 
-    // Bawa data pemain langsung di dalam nextQuestion agar UI Mentor tidak kosong
     io.to(roomCode).emit('nextQuestion', {
       questionText: currentQ.q,
       length: currentQ.a.length,
       index: room.currentQuestionIndex + 1,
       total: room.questions.length,
-      playersData: Object.values(room.players) // <- DATA DIKIRIM LANGSUNG
+      playersData: Object.values(room.players)
     });
 
     clearInterval(room.intervalId);

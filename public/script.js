@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initKeyboard();
 });
 
+// Menggunakan reload untuk memastikan bersihnya cache koneksi socket setelah game selesai/keluar
 function goToHome() { window.location.reload(); }
 
 // ==========================================
@@ -52,7 +53,6 @@ socket.on('errorMsg', (msg) => {
   document.getElementById("mentorErrorMsg").innerText = msg;
 });
 
-// Fungsi untuk menggambar ulang daftar pemain di layar Monitor
 function renderLiveLeaderboard(players) {
   players.sort((a,b) => b.score - a.score);
   const lb = document.getElementById("liveLeaderboard");
@@ -99,15 +99,13 @@ socket.on('joinError', (msg) => { alert(msg); goToHome(); });
 socket.on('nextQuestion', ({ questionText, length, index, total, playersData }) => {
   document.getElementById("message").innerText = ""; 
   
-  // Jika Mentor
   if (currentRoomCode && !myPlayerName) {
     showScreen("mentorMonitorScreen");
     document.getElementById("monitorProgress").innerText = `${index}/${total}`;
-    renderLiveLeaderboard(playersData); // Pastikan layar di-render langsung dari data server!
+    renderLiveLeaderboard(playersData);
     return;
   }
 
-  // Jika Siswa
   showScreen("gameScreen");
   document.getElementById("question").innerText = questionText;
   currentAnswerLength = length;
@@ -169,7 +167,12 @@ function checkGuess() {
   let guess = "";
   for (let i = 0; i < boxes.length; i++) guess += boxes[i].innerText;
 
-  if (guess.length !== currentAnswerLength) return showMessage("Huruf belum lengkap!", "#e21b3c");
+  if (guess.length !== currentAnswerLength) {
+      // Menambahkan efek visual getar kecil jika jawaban belum lengkap (opsional)
+      rows[row].classList.add("shake-row");
+      setTimeout(() => rows[row].classList.remove("shake-row"), 300);
+      return showMessage("Huruf belum lengkap!", "#e21b3c");
+  }
 
   isMyTurnActive = false;
   socket.emit('submitGuess', { roomCode: currentRoomCode, guess });
