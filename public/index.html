@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guessly</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="introScreen" class="fullscreen-container bg-purple">
+    <h1 class="logo-text pulsing">Guessly</h1>
+  </div>
+
+  <div id="homeScreen" class="fullscreen-container bg-purple hidden">
+    <h1 class="logo-text">Guessly</h1>
+    <div class="kahoot-card">
+      <button onclick="showScreen('mentorLoginScreen')" class="kahoot-btn btn-blue">Host Game</button>
+      <button onclick="showScreen('studentJoinScreen')" class="kahoot-btn btn-red">Join Game</button>
+    </div>
+    <div class="bottom-links">
+      <a href="admin.html" class="text-link" style="display:block; text-align:center;">Panel Soal Mentor</a>
+    </div>
+  </div>
+
+  <div id="mentorLoginScreen" class="fullscreen-container bg-purple hidden">
+    <h1 class="logo-text">Host Game</h1>
+    <div class="kahoot-card">
+      <input type="text" id="inputMentorID" placeholder="Username Mentor" autocomplete="off">
+      <button id="btnHost" class="kahoot-btn btn-blue">Buat Room</button>
+      <p id="hostError" class="error-text"></p>
+    </div>
+    <div class="bottom-links">
+      <button class="text-link" onclick="goToHome()">Kembali</button>
+    </div>
+  </div>
+
+  <div id="mentorLobby" class="fullscreen-container bg-light hidden">
+    <div class="top-bar">
+      <div class="pin-display">Game PIN: <span id="generatedRoomCode">---</span></div>
+      <button class="kahoot-btn btn-grey small-btn" onclick="goToHome()">Keluar</button>
+    </div>
+    <div class="lobby-content">
+      <div class="player-count">Pemain Terhubung: <span id="playerCount">0</span></div>
+      <div id="mentorOptions" class="hidden mentor-control">
+        <button id="btnStartPlay" class="kahoot-btn btn-green">Mulai Permainan</button>
+        <p id="mentorErrorMsg" class="error-text"></p>
+      </div>
+      <div id="playerList" class="player-list"></div>
+    </div>
+  </div>
+
+  <div id="mentorMonitorScreen" class="fullscreen-container bg-light hidden">
+    <div class="top-bar">
+      <div class="timer-badge circle-timer" id="monitorTimer">30</div>
+      <div class="question-progress">Soal <span id="monitorProgress">0/0</span></div>
+    </div>
+    <div class="lobby-content wide">
+      <div class="leaderboard-list" id="liveLeaderboard"></div>
+    </div>
+  </div>
+
+  <div id="studentJoinScreen" class="fullscreen-container bg-purple hidden">
+    <h1 class="logo-text">Join Game</h1>
+    <div class="kahoot-card">
+      <input type="text" id="inputRoomCode" placeholder="Game PIN" maxlength="6" autocomplete="off">
+      <input type="text" id="inputPlayerName" placeholder="Nickname" maxlength="12" autocomplete="off">
+      <button id="btnEnterRoom" class="kahoot-btn btn-black">Masuk</button>
+      <p id="joinError" class="error-text"></p>
+    </div>
+    <div class="bottom-links">
+      <button class="text-link" onclick="goToHome()">Kembali</button>
+    </div>
+  </div>
+
+  <div id="studentWaiting" class="fullscreen-container bg-green hidden">
+    <h2 class="waiting-text">Anda sudah masuk!</h2>
+    <p class="waiting-subtext">Perhatikan layar utama host</p>
+    <h1 class="player-nickname" id="displayName"></h1>
+  </div>
+
+  <div id="gameScreen" class="fullscreen-container bg-light hidden">
+    <div class="game-top-bar">
+      <div class="player-info"><span id="gamePlayerName">Siswa</span></div>
+      <div class="timer-badge circle-timer" id="studentTimer">30</div>
+      <div class="score-info">Skor: <span id="score">0</span></div>
+    </div>
+    <div class="game-content">
+      <h2 id="question" class="question-block">Menunggu soal dari server...</h2>
+      <div id="board"></div>
+      <p id="message" class="feedback-msg"></p>
+      <div id="keyboard-container" class="keyboard"></div>
+    </div>
+  </div>
+
+  <div id="leaderboardScreen" class="fullscreen-container bg-purple hidden">
+    <h1 class="logo-text">Podium</h1>
+    <div class="kahoot-card wide">
+      <div class="leaderboard-list" id="finalLeaderboardList"></div>
+      <button class="kahoot-btn btn-blue" onclick="goToHome()">Selesai</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

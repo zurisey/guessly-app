@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Guessly</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+  <div class="fullscreen-container bg-light">
+    <div class="top-bar">
+      <h2>Panel Mentor</h2>
+      <a href="index.html" class="kahoot-btn btn-grey small-btn" style="text-decoration: none;">Ke Beranda</a>
+    </div>
+
+    <div class="lobby-content" id="adminLoginPanel" style="margin-top: 100px;">
+      <div class="kahoot-card">
+        <h3>Login Data Mentor</h3>
+        <input type="text" id="adminUsername" placeholder="Username Mentor">
+        <button id="btnLoadQuestions" class="kahoot-btn btn-blue">Akses Soal Saya</button>
+      </div>
+    </div>
+
+    <div class="lobby-content wide hidden" id="adminDashboardPanel" style="margin-top: 100px;">
+      <div class="player-count" style="margin-bottom: 20px;">
+        Database milik: <span id="displayAdminUser"></span>
+      </div>
+
+      <div class="kahoot-card wide" style="margin-bottom: 25px;">
+        <h3>Buat Soal Baru</h3>
+        <input type="text" id="newQuestion" placeholder="Pertanyaan">
+        <input type="text" id="newAnswer" placeholder="Kunci Jawaban">
+        <button id="btnAddQuestion" class="kahoot-btn btn-green">Simpan ke Database</button>
+        <p id="adminError" class="error-text"></p>
+      </div>
+
+      <div class="kahoot-card wide">
+        <h3>Daftar Soal Saya</h3>
+        <ul id="questionList" class="admin-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

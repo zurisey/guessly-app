@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+}
+
+.hidden { display: none !important; }
+.bg-purple { background-color: #46178f; }
+.bg-light { background-color: #f2f2f2; }
+.bg-green { background-color: #26890c; color: white; }
+
+.fullscreen-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.logo-text {
+  font-size: 4rem;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 20px;
+  text-shadow: 0 5px 0 rgba(0,0,0,0.2);
+  letter-spacing: 2px;
+}
+.pulsing { animation: pulse 2s infinite; }
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+.kahoot-card {
+  background: white; padding: 24px; border-radius: 4px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.1); width: 100%; max-width: 400px;
+  display: flex; flex-direction: column; gap: 15px; box-sizing: border-box;
+}
+.kahoot-card.wide { max-width: 600px; }
+
+input[type="text"] {
+  width: 100%; padding: 18px; border: 2px solid #ccc; border-radius: 4px;
+  font-size: 1.1rem; font-weight: 700; text-align: center; font-family: inherit; box-sizing: border-box;
+}
+input[type="text"]:focus { outline: none; border-color: #46178f; }
+
+.kahoot-btn {
+  width: 100%; padding: 18px; border: none; border-radius: 4px;
+  font-size: 1.2rem; font-weight: 800; color: white; cursor: pointer;
+  font-family: inherit; transition: transform 0.1s, box-shadow 0.1s;
+  text-transform: uppercase;
+}
+.kahoot-btn:active { transform: translateY(4px); box-shadow: 0 0 0 !important; }
+
+.btn-black { background: #333; box-shadow: 0 4px 0 #000; }
+.btn-blue  { background: #1368ce; box-shadow: 0 4px 0 #0c4284; }
+.btn-red   { background: #e21b3c; box-shadow: 0 4px 0 #8f1126; }
+.btn-green { background: #26890c; box-shadow: 0 4px 0 #165007; }
+.btn-grey  { background: #fff; color: #333; box-shadow: 0 4px 0 #ccc; border: 2px solid #ccc; }
+
+.small-btn { padding: 10px 15px; font-size: 0.9rem; width: auto; }
+.text-link { background: none; border: none; color: white; font-weight: 700; cursor: pointer; margin-top: 20px; font-size: 1rem; }
+.error-text { color: #e21b3c; text-align: center; font-weight: 700; margin: 0; min-height: 20px; }
+
+/* TOP BAR & LOBBY */
+.top-bar {
+  width: 100%; background: white; padding: 15px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
+  position: fixed; top: 0; left: 0; z-index: 10;
+}
+.pin-display { font-size: 1.5rem; font-weight: 800; }
+.pin-display span { font-size: 2.5rem; color: #333; letter-spacing: 2px; display: block;}
+
+.lobby-content { margin-top: 80px; width: 100%; max-width: 800px; display: flex; flex-direction: column; align-items: center; }
+.lobby-content.wide { max-width: 700px; }
+
+.player-count { background: #333; color: white; padding: 10px 20px; border-radius: 4px; font-weight: 700; margin-bottom: 20px; font-size: 1.2rem;}
+.player-list { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; width: 100%; }
+.player-tag { background: #1368ce; color: white; padding: 10px 20px; border-radius: 4px; font-weight: 700; box-shadow: 0 4px 0 #0c4284; font-size: 1.1rem;}
+
+.mentor-control { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 400px; }
+
+/* TIMER CIRCLE */
+.circle-timer {
+  background: #46178f; color: white; font-size: 1.5rem; font-weight: 900;
+  width: 50px; height: 50px; border-radius: 50%; display: flex;
+  justify-content: center; align-items: center; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+}
+.question-progress { font-weight: 800; font-size: 1.2rem; }
+
+/* TIMPA BAGIAN WORDLE GRID CSS LAMA-MU DENGAN INI */
+#board { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 6px; 
+  margin-bottom: 15px; 
+  width: 100%;
+  max-width: 600px;
+  align-items: center; 
+}
+
+.row { 
+  display: flex; 
+  justify-content: center; 
+  gap: 4px; 
+  width: 100%;
+  flex-wrap: nowrap; /* Jangan perbolehkan turun baris */
+}
+
+.box {
+  width: 40px;  /* Lebar mutlak */
+  height: 40px; /* Tinggi mutlak */
+  font-size: 1.5rem; /* Font dikecilkan agar proporsional */
+  background: white; 
+  font-weight: 900;
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  border-radius: 4px;
+  text-transform: uppercase; 
+  box-shadow: 0 4px 0 rgba(0,0,0,0.1); 
+  border: 2px solid #ccc;
+  flex-shrink: 1; /* Biarkan ia mengecil jika layar terlalu sempit */
+}
+
+/* Lanjutkan dengan efek animasi dan pewarnaan .box (correct, present, wrong) */
+
+.box.flip { animation: flipBox 0.4s ease-in-out forwards; }
+@keyframes flipBox { 0% { transform: rotateX(0deg); } 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0deg); } }
+
+.correct { background: #26890c !important; color: white; box-shadow: 0 4px 0 #165007 !important; border-color: #26890c !important; }
+.present { background: #d89e00 !important; color: white; box-shadow: 0 4px 0 #9e7400 !important; border-color: #d89e00 !important; }
+.wrong   { background: #787c7e !important; color: white; box-shadow: 0 4px 0 #555 !important; border-color: #787c7e !important; }
+.feedback-msg { font-size: 1.2rem; font-weight: 800; height: 25px; margin: 5px 0; text-align: center; text-transform: uppercase;}
+
+/* KEYBOARD */
+.keyboard { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 500px; margin-top: 10px; }
+.key-row { display: flex; justify-content: center; gap: 6px; }
+.key {
+  background-color: #f2f2f2; border: 2px solid #ccc; border-radius: 4px; font-weight: 800; font-size: 1.1rem;
+  padding: 14px 4px; cursor: pointer; flex: 1; text-transform: uppercase; box-shadow: 0 4px 0 #ccc; transition: all 0.1s;
+}
+.key:active { transform: translateY(4px); box-shadow: 0 0 0; }
+.key.wide-key { flex: 1.5; font-size: 0.9rem; }
+
+/* LEADERBOARD LIST */
+.leaderboard-list { width: 100%; margin-bottom: 15px; }
+.live-player {
+  display: flex; justify-content: space-between; padding: 15px; background: #f9f9f9;
+  margin-bottom: 8px; border-radius: 4px; font-weight: 800; box-shadow: 0 4px 0 rgba(0,0,0,0.1); font-size: 1.1rem;
+}
+.live-player:nth-child(1) { background: #e21b3c; color: white; }
+.live-player:nth-child(2) { background: #1368ce; color: white; }
+.live-player:nth-child(3) { background: #d89e00; color: white; }
+
+/* Admin List UI */
+.admin-list { list-style: none; padding: 0; width: 100%; }
+.admin-list li {
+  display: flex; justify-content: space-between; align-items: center;
+  background: white; padding: 15px; margin-bottom: 10px; border-radius: 4px; border-left: 6px solid #46178f; box-shadow: 0 4px 0 rgba(0,0,0,0.05);
+}
+.btn-delete { background: #e21b3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #8f1126;}
+.btn-delete:active { transform: translateY(4px); box-shadow: 0 0 0; }
