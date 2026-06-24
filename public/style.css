@@ -168,6 +168,13 @@ input[type="text"]:focus { outline: none; border-color: #46178f; }
 .btn-delete { background: #e21b3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #8f1126;}
 .btn-delete:active { transform: translateY(4px); box-shadow: 0 0 0; }
 
+/* DISCOVER UI */
+.quiz-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; width: 100%; }
+.discover-card { width: 100%; max-width: 320px; text-align: left; padding: 20px; }
+.discover-card h3 { margin: 0 0 10px 0; color: #46178f; font-size: 1.3rem; }
+.discover-card p { margin: 5px 0; font-size: 0.95rem; color: #555; }
+.category-badge { display: inline-block; background: #f2f2f2; border: 1px solid #ccc; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; margin-bottom: 10px; }
+
 /* MOBILE RESPONSIVE */
 @media (max-width: 600px) {
   .game-top-bar { padding: 10px 15px; }

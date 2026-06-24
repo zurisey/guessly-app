@@ -18,7 +18,37 @@ let mentorDatabases = {
   ]
 };
 
+// DATABASE KUIS PUBLIK (Discover)
+let publicQuizzes = [
+  { 
+    id: "kuis_umum1", title: "Pengetahuan Umum SD", category: "Umum", author: "Admin", 
+    questions: [
+      { q: "Ibukota negara Indonesia?", a: "JAKARTA" },
+      { q: "Planet terdekat dari matahari?", a: "MERKURIUS" }
+    ]
+  },
+  { 
+    id: "kuis_sejarah1", title: "Sejarah Kemerdekaan", category: "Sejarah", author: "Pak Budi", 
+    questions: [
+      { q: "Bulan kemerdekaan Indonesia?", a: "AGUSTUS" },
+      { q: "Siapa proklamator kita selain Hatta?", a: "SOEKARNO" }
+    ]
+  },
+  { 
+    id: "kuis_ipa1", title: "Biologi Dasar", category: "IPA", author: "Bu Siska", 
+    questions: [
+      { q: "Pusat tata surya kita?", a: "MATAHARI" },
+      { q: "Hewan pemakan daging disebut?", a: "KARNIVORA" }
+    ]
+  }
+];
+
 let activeRooms = {}; 
+
+// API DISCOVER: Ambil semua kuis publik
+app.get('/api/discover', (req, res) => {
+  res.json(publicQuizzes);
+});
 
 // API MENTOR: Ambil Soal
 app.get('/api/questions/:username', (req, res) => {
@@ -72,7 +102,6 @@ app.delete('/api/questions/:username/:index', (req, res) => {
 
 // SOCKET IO ENGINE
 io.on('connection', (socket) => {
-  
   socket.on('createRoom', (mentorUsername) => {
     let roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
     if (!mentorDatabases[mentorUsername]) mentorDatabases[mentorUsername] = [];
@@ -108,7 +137,6 @@ io.on('connection', (socket) => {
     if (room && room.hostId === socket.id) {
       room.gameStarted = true;
       let myQuestions = mentorDatabases[room.mentorName] || [];
-      // Acak soal dan ambil maksimal 5
       room.questions = [...myQuestions].sort(() => Math.random() - 0.5).slice(0, 5);
       room.currentQuestionIndex = 0;
 

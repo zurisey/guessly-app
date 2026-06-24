@@ -17,9 +17,21 @@
     <div class="kahoot-card">
       <button onclick="showScreen('mentorLoginScreen')" class="kahoot-btn btn-blue">Host Game</button>
       <button onclick="showScreen('studentJoinScreen')" class="kahoot-btn btn-red">Join Game</button>
+      <button onclick="openDiscover()" class="kahoot-btn btn-green" style="margin-top: 10px;">Discover & Latihan</button>
     </div>
     <div class="bottom-links">
       <a href="admin.html" class="text-link" style="display:block; text-align:center;">Panel Soal Mentor</a>
+    </div>
+  </div>
+
+  <div id="discoverScreen" class="fullscreen-container bg-light hidden">
+    <div class="top-bar">
+      <h2>Discover Quizzes</h2>
+      <button class="kahoot-btn btn-grey small-btn" onclick="goToHome()">Kembali</button>
+    </div>
+    <div class="lobby-content wide">
+      <input type="text" id="searchQuiz" placeholder="Cari Mata Pelajaran atau Judul..." onkeyup="filterQuizzes()" style="margin-bottom: 20px;">
+      <div id="quizList" class="quiz-grid"></div>
     </div>
   </div>
 

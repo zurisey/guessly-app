@@ -69,7 +69,7 @@ socket.on('liveLeaderboardUpdate', (players) => {
 });
 
 // ==========================================
-// SISWA / PLAYER
+// SISWA / PLAYER MULTIPLAYER
 // ==========================================
 document.getElementById("btnEnterRoom").addEventListener("click", () => {
   let roomCode = document.getElementById("inputRoomCode").value.toUpperCase().trim();
@@ -173,34 +173,56 @@ function checkGuess() {
   }
 
   isMyTurnActive = false;
-  socket.emit('submitGuess', { roomCode: currentRoomCode, guess });
 
-  socket.once('guessResult', ({ result, isCorrect }) => {
-    for (let i = 0; i < result.length; i++) {
-      setTimeout(() => {
-        boxes[i].classList.add("flip"); boxes[i].classList.add(result[i]);
-        updateKeyboardColor(guess[i], result[i]);
-      }, i * 150);
-    }
-
-    setTimeout(() => {
-      if (isCorrect) {
-        let kalkulasiPoin = (row === 0) ? 30 : (row === 1) ? 20 : 10;
-        score += kalkulasiPoin;
-        document.getElementById("score").innerText = score;
-        showMessage("BENAR SEKALI!", "#26890c");
-        socket.emit('updateScore', { roomCode: currentRoomCode, points: kalkulasiPoin });
-      } else {
-        row++; col = 0;
-        if (row === 3) {
-          showMessage("KESEMPATAN HABIS!", "#e21b3c");
-          socket.emit('updateScore', { roomCode: currentRoomCode, points: 0 });
-        } else {
-          isMyTurnActive = true;
-        }
+  if (isSoloMode) {
+      let answer = soloQuestions[soloCurrentIndex].a;
+      let result = [];
+      for (let i = 0; i < answer.length; i++) {
+        if (guess[i] === answer[i]) result.push("correct");
+        else if (answer.includes(guess[i])) result.push("present");
+        else result.push("wrong");
       }
-    }, result.length * 150);
-  });
+      processGuessResult(result, guess === answer, guess);
+  } else {
+      socket.emit('submitGuess', { roomCode: currentRoomCode, guess });
+      socket.once('guessResult', ({ result, isCorrect }) => {
+          processGuessResult(result, isCorrect, guess);
+      });
+  }
+}
+
+function processGuessResult(result, isCorrect, guess) {
+  let rows = document.getElementById("board").children;
+  let boxes = rows[row].children;
+
+  for (let i = 0; i < result.length; i++) {
+    setTimeout(() => {
+      boxes[i].classList.add("flip"); boxes[i].classList.add(result[i]);
+      updateKeyboardColor(guess[i], result[i]);
+    }, i * 150);
+  }
+
+  setTimeout(() => {
+    if (isCorrect) {
+      let kalkulasiPoin = (row === 0) ? 30 : (row === 1) ? 20 : 10;
+      score += kalkulasiPoin;
+      document.getElementById("score").innerText = score;
+      showMessage("BENAR SEKALI!", "#26890c");
+      
+      if (!isSoloMode) socket.emit('updateScore', { roomCode: currentRoomCode, points: kalkulasiPoin });
+      else setTimeout(() => { soloCurrentIndex++; nextSoloQuestion(); }, 2000);
+      
+    } else {
+      row++; col = 0;
+      if (row === 3) {
+        showMessage("KESEMPATAN HABIS!", "#e21b3c");
+        if (!isSoloMode) socket.emit('updateScore', { roomCode: currentRoomCode, points: 0 });
+        else setTimeout(() => { soloCurrentIndex++; nextSoloQuestion(); }, 2000);
+      } else {
+        isMyTurnActive = true;
+      }
+    }
+  }, result.length * 150);
 }
 
 function showMessage(text, color) {
@@ -260,4 +282,73 @@ function resetKeyboardColors() {
   document.querySelectorAll(".key").forEach(k => {
     k.className = "key"; if(k.innerText === "ENTER" || k.innerText === "DEL") k.classList.add("wide-key");
   });
+}
+
+// ==========================================
+// FITUR DISCOVER & MAIN SOLO
+// ==========================================
+let allQuizzes = [];
+let isSoloMode = false;
+let soloQuestions = [];
+let soloCurrentIndex = 0;
+
+async function openDiscover() {
+  showScreen('discoverScreen');
+  const res = await fetch('/api/discover');
+  allQuizzes = await res.json();
+  renderQuizzes(allQuizzes);
+}
+
+function renderQuizzes(quizzes) {
+  const container = document.getElementById('quizList');
+  container.innerHTML = "";
+  quizzes.forEach(quiz => {
+    let card = document.createElement('div');
+    card.className = "kahoot-card discover-card";
+    card.innerHTML = `
+      <span class="category-badge">${quiz.category}</span>
+      <h3>${quiz.title}</h3>
+      <p>Oleh: <strong>${quiz.author}</strong> | ${quiz.questions.length} Soal</p>
+      <button class="kahoot-btn btn-black small-btn" style="margin-top:15px;" onclick="playSolo('${quiz.id}')">Main Solo</button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function filterQuizzes() {
+  const keyword = document.getElementById('searchQuiz').value.toLowerCase();
+  const filtered = allQuizzes.filter(q => 
+    q.title.toLowerCase().includes(keyword) || 
+    q.category.toLowerCase().includes(keyword)
+  );
+  renderQuizzes(filtered);
+}
+
+function playSolo(quizId) {
+  const quiz = allQuizzes.find(q => q.id === quizId);
+  if (!quiz) return;
+  
+  soloQuestions = [...quiz.questions].sort(() => Math.random() - 0.5);
+  soloCurrentIndex = 0;
+  isSoloMode = true;
+  score = 0;
+  document.getElementById("score").innerText = score;
+  document.getElementById("gamePlayerName").innerText = "Mode Latihan";
+  document.getElementById("message").innerText = ""; 
+  
+  nextSoloQuestion();
+}
+
+function nextSoloQuestion() {
+  if (soloCurrentIndex >= soloQuestions.length) {
+    alert("Latihan selesai! Skor Akhir: " + score);
+    return goToHome();
+  }
+  const q = soloQuestions[soloCurrentIndex];
+  showScreen("gameScreen");
+  document.getElementById("question").innerText = q.q;
+  document.getElementById("studentTimer").innerText = "∞"; 
+  currentAnswerLength = q.a.length;
+  createBoard(currentAnswerLength);
+  isMyTurnActive = true;
 }
