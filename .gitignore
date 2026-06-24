@@ -1,3 +1,14 @@
-node_modules
+# Dependensi
+node_modules/
+
+# File sistem & Editor
 .DS_Store
-package-lock.json
+Thumbs.db
+.vscode/
+
+# Log & Debug
+npm-debug.log
+*.log
+
+# File lingkungan (jika nantinya pakai .env)
+.env
