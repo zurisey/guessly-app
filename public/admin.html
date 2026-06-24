@@ -28,7 +28,14 @@
       </div>
 
       <div class="kahoot-card wide" style="margin-bottom: 25px;">
-        <h3>Buat Soal Baru</h3>
+        <h3>Upload Soal via .txt</h3>
+        <p style="font-size: 0.9rem; margin-top: 0; color: #555;">Format per baris: <strong>Pertanyaan | Jawaban</strong></p>
+        <input type="file" id="fileTxt" accept=".txt" style="padding: 10px; border: 2px dashed #ccc; cursor: pointer; width: 100%; box-sizing: border-box;">
+        <button id="btnUploadTxt" class="kahoot-btn btn-blue" style="margin-top: 10px;">Upload File</button>
+      </div>
+
+      <div class="kahoot-card wide" style="margin-bottom: 25px;">
+        <h3>Buat Soal Baru (Manual)</h3>
         <input type="text" id="newQuestion" placeholder="Pertanyaan">
         <input type="text" id="newAnswer" placeholder="Kunci Jawaban">
         <button id="btnAddQuestion" class="kahoot-btn btn-green">Simpan ke Database</button>

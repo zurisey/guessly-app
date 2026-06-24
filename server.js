@@ -14,33 +14,52 @@ app.use(express.static(path.join(__dirname, 'public')));
 let mentorDatabases = {
   "admin": [
     { q: "Kerajaan Hindu tertua di Nusantara?", a: "KUTAI" },
-    { q: "Sumpah yang diikrarkan oleh Mahapatih Gajah Mada?", a: "PALAPA" },
-    { q: "Negara yang menjajah Indonesia selama 3,5 abad?", a: "BELANDA" }
+    { q: "Sumpah yang diikrarkan oleh Mahapatih Gajah Mada?", a: "PALAPA" }
   ]
 };
 
 let activeRooms = {}; 
 
-// API UNTUK ADMIN (Berdasarkan Username)
+// API MENTOR: Ambil Soal
 app.get('/api/questions/:username', (req, res) => {
   const user = req.params.username;
-  if (!mentorDatabases[user]) mentorDatabases[user] = [];
-  res.json(mentorDatabases[user]);
+  res.json(mentorDatabases[user] || []);
 });
 
+// API MENTOR: Tambah 1 Soal Manual
 app.post('/api/questions/:username', (req, res) => {
   const user = req.params.username;
   const { q, a } = req.body;
   if (!mentorDatabases[user]) mentorDatabases[user] = [];
   
   if (q && a) {
-    // Spasi dan karakter non-huruf dihapus dari jawaban
     mentorDatabases[user].push({ q, a: a.toUpperCase().replace(/[^A-Z]/g, "") });
     return res.json({ success: true });
   }
   res.status(400).json({ error: "Data tidak valid" });
 });
 
+// API MENTOR: Bulk Upload via TXT
+app.post('/api/questions/bulk/:username', (req, res) => {
+  const user = req.params.username;
+  const { questions } = req.body;
+  if (!mentorDatabases[user]) mentorDatabases[user] = [];
+  
+  if (Array.isArray(questions) && questions.length > 0) {
+    questions.forEach(item => {
+      if(item.q && item.a) {
+        mentorDatabases[user].push({ 
+          q: item.q, 
+          a: item.a.toUpperCase().replace(/[^A-Z]/g, "") 
+        });
+      }
+    });
+    return res.json({ success: true });
+  }
+  res.status(400).json({ error: "Data tidak valid" });
+});
+
+// API MENTOR: Hapus Soal
 app.delete('/api/questions/:username/:index', (req, res) => {
   const user = req.params.username;
   const index = parseInt(req.params.index);
@@ -54,10 +73,8 @@ app.delete('/api/questions/:username/:index', (req, res) => {
 // SOCKET IO ENGINE
 io.on('connection', (socket) => {
   
-  // Mentor Membuat Room dengan Username mereka
   socket.on('createRoom', (mentorUsername) => {
     let roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-    
     if (!mentorDatabases[mentorUsername]) mentorDatabases[mentorUsername] = [];
 
     activeRooms[roomCode] = {
@@ -90,18 +107,19 @@ io.on('connection', (socket) => {
     const room = activeRooms[roomCode];
     if (room && room.hostId === socket.id) {
       room.gameStarted = true;
-      
       let myQuestions = mentorDatabases[room.mentorName] || [];
+      // Acak soal dan ambil maksimal 5
       room.questions = [...myQuestions].sort(() => Math.random() - 0.5).slice(0, 5);
       room.currentQuestionIndex = 0;
 
-      if (room.questions.length === 0) return socket.emit('errorMsg', "Bank soal Anda kosong! Isi di panel Admin.");
+      if (room.questions.length === 0) return socket.emit('errorMsg', "Bank soal kosong! Isi di panel Admin.");
       sendQuestion(roomCode);
     }
   });
 
   function sendQuestion(roomCode) {
     const room = activeRooms[roomCode];
+    if (!room) return;
     const currentQ = room.questions[room.currentQuestionIndex];
     room.timer = 30;
     

@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initKeyboard();
 });
 
-// Menggunakan reload untuk memastikan bersihnya cache koneksi socket setelah game selesai/keluar
 function goToHome() { window.location.reload(); }
 
 // ==========================================
@@ -94,7 +93,7 @@ socket.on('joinSuccess', ({ roomCode, playerName }) => {
 socket.on('joinError', (msg) => { alert(msg); goToHome(); });
 
 // ==========================================
-// GAMEPLAY ENGINE (TIMER & WORDLE)
+// GAMEPLAY ENGINE
 // ==========================================
 socket.on('nextQuestion', ({ questionText, length, index, total, playersData }) => {
   document.getElementById("message").innerText = ""; 
@@ -168,7 +167,6 @@ function checkGuess() {
   for (let i = 0; i < boxes.length; i++) guess += boxes[i].innerText;
 
   if (guess.length !== currentAnswerLength) {
-      // Menambahkan efek visual getar kecil jika jawaban belum lengkap (opsional)
       rows[row].classList.add("shake-row");
       setTimeout(() => rows[row].classList.remove("shake-row"), 300);
       return showMessage("Huruf belum lengkap!", "#e21b3c");
