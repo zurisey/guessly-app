@@ -24,7 +24,6 @@
     </div>
   </div>
 
-  <!-- DISCOVER SCREEN -->
   <div id="discoverScreen" class="fullscreen-container bg-light hidden">
     <div class="top-bar">
       <h2>Discover Quizzes</h2>
@@ -36,7 +35,6 @@
     </div>
   </div>
 
-  <!-- DISCOVER MULTIPLAYER HOST NICKNAME INTAKE -->
   <div id="discoverHostScreen" class="fullscreen-container bg-purple hidden">
     <h1 class="logo-text">Main Bareng</h1>
     <div class="kahoot-card">
@@ -50,7 +48,6 @@
     </div>
   </div>
 
-  <!-- LOBBY MULTIPLAYER MANDIRI SISWA -->
   <div id="studentHostLobby" class="fullscreen-container bg-light hidden">
     <div class="top-bar">
       <div class="pin-display">Game PIN: <span id="studentRoomCode">---</span></div>
@@ -67,12 +64,20 @@
     </div>
   </div>
 
-  <!-- MENTOR SCREENS -->
   <div id="mentorLoginScreen" class="fullscreen-container bg-purple hidden">
     <h1 class="logo-text">Host Game</h1>
     <div class="kahoot-card">
-      <input type="text" id="inputMentorID" placeholder="Username Mentor" autocomplete="off">
-      <button id="btnHost" class="kahoot-btn btn-blue">Buat Room</button>
+      <div id="mentorAuthStage">
+        <input type="text" id="inputMentorID" placeholder="Username Mentor" autocomplete="off">
+        <button id="btnCheckMentor" class="kahoot-btn btn-blue">Cek Koleksi Soal</button>
+      </div>
+      
+      <div id="mentorSelectStage" class="hidden" style="margin-top: 15px; text-align: left;">
+        <p style="margin: 5px 0; font-weight: bold; color: #333;">Pilih Kumpulan Soal Terpilih:</p>
+        <select id="selectQuizToHost" style="width: 100%; padding: 12px; font-size: 1rem; margin-bottom: 15px; border-radius: 6px; border: 2px solid #ccc; font-family: sans-serif;"></select>
+        <button id="btnHost" class="kahoot-btn btn-green">Buat Room & Buka Lobby</button>
+      </div>
+      
       <p id="hostError" class="error-text"></p>
     </div>
     <div class="bottom-links">
@@ -86,6 +91,7 @@
       <button class="kahoot-btn btn-grey small-btn" onclick="goToHome()">Keluar</button>
     </div>
     <div class="lobby-content">
+      <h2 id="mentorLobbyTitle" style="color:#46178f; margin-bottom:15px;">Kuis: Loading...</h2>
       <div class="player-count">Pemain Terhubung: <span id="playerCount">0</span></div>
       <div id="mentorOptions" class="hidden mentor-control">
         <button id="btnStartPlay" class="kahoot-btn btn-green">Mulai Permainan</button>
@@ -105,7 +111,6 @@
     </div>
   </div>
 
-  <!-- STUDENT SCREENS -->
   <div id="studentJoinScreen" class="fullscreen-container bg-purple hidden">
     <h1 class="logo-text">Join Game</h1>
     <div class="kahoot-card">
@@ -125,7 +130,6 @@
     <h1 class="player-nickname" id="displayName"></h1>
   </div>
 
-  <!-- GAMEPLAY SCREEN -->
   <div id="gameScreen" class="fullscreen-container bg-light hidden">
     <div class="game-top-bar">
       <div class="player-info"><span id="gamePlayerName">Siswa</span></div>
@@ -140,7 +144,6 @@
     </div>
   </div>
 
-  <!-- LEADERBOARD -->
   <div id="leaderboardScreen" class="fullscreen-container bg-purple hidden">
     <h1 class="logo-text">Podium</h1>
     <div class="kahoot-card wide">

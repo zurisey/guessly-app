@@ -6,7 +6,6 @@ let currentAnswerLength = 0;
 let row = 0; let col = 0; let score = 0;
 let isMyTurnActive = false;
 
-// Variabel Tambahan Mode Solo & Multiplayer Discover Mandiri
 let allQuizzes = [];
 let isSoloMode = false;
 let soloQuestions = [];
@@ -26,23 +25,56 @@ document.addEventListener("DOMContentLoaded", () => {
 function goToHome() { window.location.reload(); }
 
 // ==========================================
-// MENTOR / HOST LOGIC
+// MENTOR / HOST LOGIC (UPGRADED WITH SELECTION)
 // ==========================================
-document.getElementById("btnHost").addEventListener("click", () => {
+document.getElementById("btnCheckMentor").addEventListener("click", async () => {
   let mentorID = document.getElementById("inputMentorID").value.trim().toLowerCase();
   if(!mentorID) return document.getElementById("hostError").innerText = "Isi Username Mentor!";
-  socket.emit('createRoom', mentorID);
+  
+  try {
+    const resPrivat = await fetch(`/api/questions/${encodeURIComponent(mentorID)}`);
+    const privateQuestions = await resPrivat.json();
+    
+    const resPublik = await fetch(`/api/publish/history/${encodeURIComponent(mentorID)}`);
+    const publicQuizzes = await resPublik.json();
+    
+    const selectEl = document.getElementById("selectQuizToHost");
+    selectEl.innerHTML = "";
+    
+    let optPrivate = document.createElement("option");
+    optPrivate.value = "private";
+    optPrivate.innerText = `💼 Bank Soal Privat Anda (${privateQuestions.length} soal)`;
+    selectEl.appendChild(optPrivate);
+    
+    publicQuizzes.forEach(quiz => {
+      let opt = document.createElement("option");
+      opt.value = quiz.id;
+      opt.innerText = `📢 [Discover] ${quiz.title} (${quiz.questions.length} soal)`;
+      selectEl.appendChild(opt);
+    });
+    
+    document.getElementById("mentorAuthStage").classList.add("hidden");
+    document.getElementById("mentorSelectStage").classList.remove("hidden");
+    document.getElementById("hostError").innerText = "";
+  } catch (e) {
+    document.getElementById("hostError").innerText = "Gagal memverifikasi akun mentor.";
+  }
 });
 
-socket.on('roomCreated', (roomCode) => {
+document.getElementById("btnHost").addEventListener("click", () => {
+  let mentorID = document.getElementById("inputMentorID").value.trim().toLowerCase();
+  let quizId = document.getElementById("selectQuizToHost").value;
+  socket.emit('createRoom', { mentorUsername: mentorID, quizId });
+});
+
+socket.on('roomCreated', ({ roomCode, quizTitle }) => {
   currentRoomCode = roomCode;
   showScreen("mentorLobby");
   document.getElementById("generatedRoomCode").innerText = roomCode;
+  document.getElementById("mentorLobbyTitle").innerText = `Kuis Aktif: ${quizTitle}`;
 });
 
-// Update Daftar Player (Kompatibel untuk Lobby Mentor & Lobby Siswa Host)
 socket.on('updatePlayerList', (players) => {
-  // 1. Jika di Layar Lobby Mentor
   const mentorCount = document.getElementById("playerCount");
   if (mentorCount) mentorCount.innerText = players.length;
   const list = document.getElementById("playerList");
@@ -57,7 +89,6 @@ socket.on('updatePlayerList', (players) => {
     document.getElementById("mentorOptions").classList.remove("hidden");
   }
 
-  // 2. Jika di Layar Lobby Multiplayer Mandiri Siswa
   const studentCount = document.getElementById("studentPlayerCount");
   if (studentCount) studentCount.innerText = players.length;
   const studentList = document.getElementById("studentHostPlayerList");
@@ -126,7 +157,6 @@ socket.on('joinError', (msg) => { alert(msg); goToHome(); });
 socket.on('nextQuestion', ({ questionText, length, index, total, playersData }) => {
   document.getElementById("message").innerText = ""; 
   
-  // Jika ini mentor (tidak punya nama player), tampilkan layar monitor
   if (currentRoomCode && !myPlayerName) {
     showScreen("mentorMonitorScreen");
     document.getElementById("monitorProgress").innerText = `${index}/${total}`;
@@ -134,7 +164,6 @@ socket.on('nextQuestion', ({ questionText, length, index, total, playersData }) 
     return;
   }
 
-  // Jika ini siswa (baik host mandiri ataupun teman), langsung masuk game board
   showScreen("gameScreen");
   document.getElementById("question").innerText = questionText;
   currentAnswerLength = length;
@@ -354,7 +383,6 @@ function filterQuizzes() {
   renderQuizzes(filtered);
 }
 
-// MODE A: Main Solo Mandiri
 function playSolo(quizId) {
   const quiz = allQuizzes.find(q => q.id === quizId);
   if (!quiz) return;
@@ -384,7 +412,6 @@ function nextSoloQuestion() {
   isMyTurnActive = true;
 }
 
-// MODE B: Main Bareng Multiplayer Mandiri (Tanpa Mentor)
 function openDiscoverHost(quizId) {
   selectedDiscoverQuizId = quizId;
   const quiz = allQuizzes.find(q => q.id === quizId);
@@ -415,7 +442,6 @@ socket.on('discoverRoomCreated', ({ roomCode, playerName, quizTitle }) => {
   document.getElementById("studentHostQuizTitle").innerText = quizTitle;
   document.getElementById("gamePlayerName").innerText = playerName;
   
-  // Set inisialisasi awal jumlah orang di lobby mandiri (baru ada host sendiri)
   document.getElementById("studentPlayerCount").innerText = "1";
   const list = document.getElementById("studentHostPlayerList");
   list.innerHTML = `<span class="player-tag">${playerName} (Host Anda)</span>`;

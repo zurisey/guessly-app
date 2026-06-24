@@ -20,20 +20,20 @@ let mentorDatabases = {
 
 // DATABASE KUIS PUBLIK (Discover)
 let publicQuizzes = [
-  // { 
-  //   id: "kuis_umum1", title: "Pengetahuan Umum SD", category: "Umum", author: "admin", 
-  //   questions: [
-  //     { q: "Ibukota negara Indonesia?", a: "JAKARTA" },
-  //     { q: "Planet terdekat dari matahari?", a: "MERKURIUS" }
-  //   ]
-  // },
-  // { 
-  //   id: "kuis_sejarah1", title: "Sejarah Kemerdekaan", category: "Sejarah", author: "pak budi", 
-  //   questions: [
-  //     { q: "Bulan kemerdekaan Indonesia?", a: "AGUSTUS" },
-  //     { q: "Siapa proklamator kita selain Hatta?", a: "SOEKARNO" }
-  //   ]
-  // }
+  { 
+    id: "kuis_umum1", title: "Pengetahuan Umum SD", category: "Umum", author: "admin", 
+    questions: [
+      { q: "Ibukota negara Indonesia?", a: "JAKARTA" },
+      { q: "Planet terdekat dari matahari?", a: "MERKURIUS" }
+    ]
+  },
+  { 
+    id: "kuis_sejarah1", title: "Sejarah Kemerdekaan", category: "Sejarah", author: "pak budi", 
+    questions: [
+      { q: "Bulan kemerdekaan Indonesia?", a: "AGUSTUS" },
+      { q: "Siapa proklamator kita selain Hatta?", a: "SOEKARNO" }
+    ]
+  }
 ];
 
 let activeRooms = {}; 
@@ -139,24 +139,38 @@ app.delete('/api/questions/:username/:index', (req, res) => {
 // SOCKET IO ENGINE
 io.on('connection', (socket) => {
   
-  socket.on('createRoom', (mentorUsername) => {
+  // SOCKET: Mengakomodasi pemilihan kuis oleh mentor (Revisi)
+  socket.on('createRoom', ({ mentorUsername, quizId }) => {
     let roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
     const user = mentorUsername.toLowerCase();
-    if (!mentorDatabases[user]) mentorDatabases[user] = [];
+    
+    let roomQuestions = [];
+    let quizTitle = "Bank Soal Privat";
+
+    if (quizId === "private") {
+      roomQuestions = mentorDatabases[user] || [];
+    } else {
+      const quiz = publicQuizzes.find(q => q.id === quizId);
+      if (quiz) {
+        roomQuestions = quiz.questions;
+        quizTitle = quiz.title;
+      }
+    }
 
     activeRooms[roomCode] = {
       hostId: socket.id,
       mentorName: user,
       isDiscoverRoom: false,
+      quizTitle: quizTitle,
       players: {},
       gameStarted: false,
-      questions: [],
+      questions: roomQuestions, 
       currentQuestionIndex: 0,
       timer: 0,
       intervalId: null
     };
     socket.join(roomCode);
-    socket.emit('roomCreated', roomCode);
+    socket.emit('roomCreated', { roomCode, quizTitle });
   });
 
   // SOCKET: Siswa membuat room mandiri dari Discover (Multiplayer tanpa mentor)
@@ -166,7 +180,7 @@ io.on('connection', (socket) => {
     if (!quiz) return socket.emit('joinError', "Kuis tidak ditemukan!");
 
     activeRooms[roomCode] = {
-      hostId: socket.id, // Siswa yang membuat bertindak sebagai host pemicu
+      hostId: socket.id, 
       isDiscoverRoom: true,
       quizTitle: quiz.title,
       players: {},
@@ -177,7 +191,6 @@ io.on('connection', (socket) => {
       intervalId: null
     };
 
-    // Otomatis masukkan siswa pembuat room sebagai pemain pertama
     activeRooms[roomCode].players[socket.id] = { name: playerName, score: 0, answered: false };
     socket.join(roomCode);
 
@@ -193,8 +206,6 @@ io.on('connection', (socket) => {
     socket.join(roomCode);
     
     socket.emit('joinSuccess', { roomCode, playerName });
-    
-    // Kirim pembaruan daftar ke host room (bisa mentor ataupun siswa host)
     io.to(room.hostId).emit('updatePlayerList', Object.values(room.players).map(p => p.name));
   });
 
@@ -202,16 +213,14 @@ io.on('connection', (socket) => {
     const room = activeRooms[roomCode];
     if (room && room.hostId === socket.id && !room.isDiscoverRoom) {
       room.gameStarted = true;
-      let myQuestions = mentorDatabases[room.mentorName] || [];
-      room.questions = [...myQuestions].sort(() => Math.random() - 0.5).slice(0, 5);
+      room.questions = [...room.questions].sort(() => Math.random() - 0.5).slice(0, 5);
       room.currentQuestionIndex = 0;
 
-      if (room.questions.length === 0) return socket.emit('errorMsg', "Bank soal kosong! Isi di panel Admin.");
+      if (room.questions.length === 0) return socket.emit('errorMsg', "Kumpulan soal terpilih kosong!");
       sendQuestion(roomCode);
     }
   });
 
-  // SOCKET: Mulai permainan untuk mode Discover Multiplayer Mandiri
   socket.on('startDiscoverGame', (roomCode) => {
     const room = activeRooms[roomCode];
     if (room && room.hostId === socket.id && room.isDiscoverRoom) {
