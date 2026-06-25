@@ -12,28 +12,28 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // DATABASE MENTOR (Penyimpanan sementara di memori)
 let mentorDatabases = {
-  "admin": [
-    { q: "Kerajaan Hindu tertua di Nusantara?", a: "KUTAI" },
-    { q: "Sumpah yang diikrarkan oleh Mahapatih Gajah Mada?", a: "PALAPA" }
-  ]
+  // "admin": [
+  //   { q: "Kerajaan Hindu tertua di Nusantara?", a: "KUTAI" },
+  //   { q: "Sumpah yang diikrarkan oleh Mahapatih Gajah Mada?", a: "PALAPA" }
+  // ]
 };
 
 // DATABASE KUIS PUBLIK (Discover)
 let publicQuizzes = [
   { 
-    id: "kuis_umum1", title: "Pengetahuan Umum SD", category: "Umum", author: "admin", 
-    questions: [
-      { q: "Ibukota negara Indonesia?", a: "JAKARTA" },
-      { q: "Planet terdekat dari matahari?", a: "MERKURIUS" }
-    ]
+    // id: "kuis_umum1", title: "Pengetahuan Umum SD", category: "Umum", author: "admin", 
+    // questions: [
+    //   { q: "Ibukota negara Indonesia?", a: "JAKARTA" },
+    //   { q: "Planet terdekat dari matahari?", a: "MERKURIUS" }
+    // ]
   },
   { 
-    id: "kuis_sejarah1", title: "Sejarah Kemerdekaan", category: "Sejarah", author: "pak budi", 
-    questions: [
-      { q: "Bulan kemerdekaan Indonesia?", a: "AGUSTUS" },
-      { q: "Siapa proklamator kita selain Hatta?", a: "SOEKARNO" }
-    ]
-  }
+  //   id: "kuis_sejarah1", title: "Sejarah Kemerdekaan", category: "Sejarah", author: "pak budi", 
+  //   questions: [
+  //     { q: "Bulan kemerdekaan Indonesia?", a: "AGUSTUS" },
+  //     { q: "Siapa proklamator kita selain Hatta?", a: "SOEKARNO" }
+  //   ]
+   }
 ];
 
 let activeRooms = {}; 
